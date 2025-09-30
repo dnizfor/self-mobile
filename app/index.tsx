@@ -8,9 +8,15 @@ import {
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { Theme } from "@/redux/themeSlice";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Redirect, useRouter } from "expo-router";
-import React from "react";
-import { FlatList, StyleSheet, Switch, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -20,6 +26,12 @@ export default function Index() {
   const router = useRouter();
   const { setTheme } = useChangeTheme();
 
+  useEffect(() => {
+    if (serverList.length == 0 && !loading) {
+      router.replace("/server");
+    }
+  }, [loading, serverList]);
+
   const toggleSwitch = () => {
     if (theme == "light") {
       setTheme(Theme.Dark);
@@ -27,9 +39,6 @@ export default function Index() {
       setTheme(Theme.Light);
     }
   };
-  if (serverList.length == 0 && !loading) {
-    return <Redirect href="/server" />;
-  }
 
   return (
     <SafeAreaView
@@ -84,6 +93,21 @@ export default function Index() {
           />
         )}
       />
+      <View style={styles.console}>
+        <TouchableOpacity
+          style={{
+            ...styles.consoleButton,
+            backgroundColor: theme == "light" ? "black" : "white",
+          }}
+          onPress={() => router.navigate("/server")}
+        >
+          <Ionicons
+            name="add"
+            size={24}
+            color={theme == "light" ? "white" : "black"}
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -94,5 +118,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     paddingBottom: 10,
+  },
+  console: {
+    position: "absolute",
+    right: 30,
+    bottom: 50,
+  },
+  consoleButton: {
+    padding: 15,
+    borderRadius: 10,
   },
 });
